@@ -11,6 +11,7 @@ func RegisterRoutes() *mux.Router {
 	router.HandleFunc("/", handler.HelloWorld).Methods("GET")
 	router.HandleFunc("/data", handler.GetData).Methods("GET")
 	router.HandleFunc("/log", handler.GetUserLog).Methods("GET")
+	// router.HandleFunc("/log", handler.InsertData).Methods("POST")
 
 	return router
 }

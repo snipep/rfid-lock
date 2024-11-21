@@ -2,6 +2,8 @@ package models
 
 import (
 	"database/sql"
+	"time"
+
 	// "time"
 
 	"github.com/snipep/iot/internal/database"
@@ -50,4 +52,18 @@ func GetUser() (*Test, error) {
 	}
 
 	return user, nil
+}
+
+
+func InsertLog(ID string, status int) error {
+	db := database.GetDB()
+	query := "INSERT INTO log (userid, status, time) VALUES (?, ?, ?)"
+	now := time.Now()
+	dateTime := now.Format("2006-01-02 15:04:05")
+	_, err := db.Exec(query, ID, status, dateTime)
+	if err != nil {
+		return err
+	}
+	
+	return nil
 }
