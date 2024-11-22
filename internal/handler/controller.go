@@ -24,6 +24,8 @@ func ProcessMessage(client mqttPkg.Client, msg mqttPkg.Message) {
 		switch msg.Topic() {
 		case "rfid/auth":
 			User_Authentication(msg)
+			client := MQTT.CreateClient("controller", nil)
+			MQTT.Publish(client, "rfid/auth/status", 0, false, "msg from backend")
 		case "rfid/auth/status":
 			ProcessAuthStatus(msg)
 		case "register/user/valid":
