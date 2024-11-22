@@ -21,9 +21,11 @@ func CreateClient(clientID string, handler mqtt.MessageHandler) mqtt.Client {
 	return client
 }
 
-func Subscribe(client mqtt.Client, topic string, qos byte)  {
-	if token := client.Subscribe(topic, qos, nil); token.Wait() && token.Error() != nil {
-		log.Fatalf("Failed to subscribe to topic: %v", token.Error())
+func Subscribe(client mqtt.Client, topics []string, qos byte) {
+	for _, topic := range topics {
+		if token := client.Subscribe(topic, qos, nil); token.Wait() && token.Error() != nil {
+			log.Fatalf("Failed to subscribe to topic '%s': %v", topic, token.Error())
+		}
+		fmt.Printf("Subscribed to topic: %s\n", topic)
 	}
-	fmt.Printf("Subscribed to topic: %s\n", topic)
 }

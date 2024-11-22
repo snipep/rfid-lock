@@ -12,19 +12,28 @@ import (
 	MQTT "github.com/snipep/iot/internal/MQTT"
 
 	// "time"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
+	mqttPkg "github.com/eclipse/paho.mqtt.golang"
 	"github.com/snipep/iot/internal/models"
 )
 
-// ProcessMessage handles incoming MQTT messages.
-func ProcessMessage(client mqtt.Client, msg mqtt.Message) {
+// ProcessMessage processes incoming MQTT messages
+func ProcessMessage(client mqttPkg.Client, msg mqttPkg.Message) {
+	go func() { // Start a Goroutine for each message
+		fmt.Printf("Message received on topic '%s': %s\n", msg.Topic(), string(msg.Payload()))
 
-	fmt.Printf("Message payload: %s\n", string(msg.Payload()))
-
-	switch msg.Topic() {
-	case "rfid/auth":
-		User_Authentication(msg)
-	}
+		switch msg.Topic() {
+		case "rfid/auth":
+			User_Authentication(msg)
+		case "rfid/auth/status":
+			ProcessAuthStatus(msg)
+		case "register/user/valid":
+			Example(msg, true)
+		case "register/user/invalid":
+			Example(msg, false)
+		default:
+			fmt.Printf("Unhandled topic: %s\n", msg.Topic())
+		}
+	}()
 }
 
 // InitializeController sets up the MQTT connection and subscription.
@@ -35,7 +44,7 @@ func InitializeController() {
 	client := MQTT.CreateClient("controller", handler)
 
 	// Subscribe to the topic
-	MQTT.Subscribe(client, MQTT.Topic, 0)
+	MQTT.Subscribe(client, MQTT.Topics, 0)
 	// fmt.Printf("Subscribed to topic: %s\n", MQTT.Topic)
 }
 
@@ -170,7 +179,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("User registered successfully"))
 }
 
-func User_Authentication(msg mqtt.Message) {
+func User_Authentication(msg mqttPkg.Message) {
 	var id struct{ID int}
 	err := json.Unmarshal([]byte(msg.Payload()), &id)
 	if err != nil {
@@ -321,4 +330,23 @@ func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	// Write the JSON response
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonData)
+}
+
+// func UserAuthentication(msg mqttPkg.Message) {
+// 	fmt.Println("Authenticating user with payload:", string(msg.Payload()))
+// 	// Add your authentication logic here
+// }
+
+func ProcessAuthStatus(msg mqttPkg.Message) {
+	fmt.Println("Processing auth status with payload:", string(msg.Payload()))
+	// Add your status processing logic here
+}
+
+func Example(msg mqttPkg.Message, isValid bool) {
+	if isValid {
+		fmt.Println("Registering valid user:", string(msg.Payload()))
+	} else {
+		fmt.Println("Invalid user registration attempt:", string(msg.Payload()))
+	}
+	// Add user registration logic here
 }
