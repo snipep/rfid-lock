@@ -49,8 +49,10 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 
 
 func GetData(w http.ResponseWriter, r *http.Request) {
+	// pars := mux.Vars(r)
+	// user_id := pars["id"]
 	// Call the GetUser function to fetch the user
-	log, err := models.GetUser()
+	log, err := models.GetUser(1)
 	if err != nil {
 		http.Error(w, "Error fetching user: "+err.Error(), http.StatusInternalServerError)
 		return

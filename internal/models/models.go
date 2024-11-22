@@ -10,14 +10,15 @@ import (
 )
 
 type Log struct {
-	ID     string    `json:"id"`
+	ID     string   `json:"id"`
 	Status int      `json:"status"`
-	Time   string `json:"time"`
+	Time   string 	`json:"time"`
 }
 
-type Test struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+type User struct {
+	ID   	int    	`json:"id"`
+	Name 	string 	`json:"name"`
+	Access 	int 	`json:"access"`
 }
 
 func GetLogs() (*Log, error) {
@@ -37,12 +38,12 @@ func GetLogs() (*Log, error) {
 	return log, nil
 }
 
-func GetUser() (*Test, error) {
+func GetUser(id int) (*User, error) {
 	db := database.GetDB() // Use the shared database instance
-	query := "SELECT id, name FROM test WHERE id = ? LIMIT 1"
-	row := db.QueryRow(query, 1)
+	query := "SELECT name, access FROM User WHERE id = ? LIMIT 1"
+	row := db.QueryRow(query, id)
 
-	user := &Test{}
+	user := &User{}
 	err := row.Scan(&user.ID, &user.Name)
 	if err != nil {
 		if err == sql.ErrNoRows {
