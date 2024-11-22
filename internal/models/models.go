@@ -67,3 +67,24 @@ func InsertLog(ID string, status int) error {
 	
 	return nil
 }
+
+func IsValidRFID(rfid string) (string, int) {
+    db := database.GetDB()
+    query := "SELECT name, access FROM User WHERE user_id = ? LIMIT 1"
+    row := db.QueryRow(query, rfid)
+
+    var Auth struct {
+        Name   string
+        Access int
+    }
+
+    err := row.Scan(&Auth.Name, &Auth.Access)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return "", 0 
+		}
+        return "", 0
+    }
+
+    return Auth.Name, Auth.Access
+}

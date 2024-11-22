@@ -18,8 +18,17 @@ func ProcessMessage(client mqtt.Client, msg mqtt.Message) {
 	// fmt.Printf("Received message on topic: %s\n", msg.Topic())
 	fmt.Printf("Message payload: %s\n", string(msg.Payload()))
 
-	// Parse JSON payload if needed (temperature and humidity)
-	// Example JSON: {"Temp":25.4,"Hum":60.3}
+	switch msg.Topic() {
+	case "rfid/auth":
+		name, isValid := models.IsValidRFID(string(msg.Payload()))
+		if isValid == 1{
+			fmt.Printf("Welcome Name %s, you are authorized\n", name)
+		} else {
+			fmt.Printf("%s Access Denied\n, you aren't authorized", name)
+		}
+	}
+
+
 	var message models.Log
 	err := json.Unmarshal([]byte(msg.Payload()), &message)
 	if err != nil {
