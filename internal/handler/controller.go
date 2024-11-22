@@ -41,7 +41,7 @@ func InitializeController() {
 
 
 
-func GetData(w http.ResponseWriter, r *http.Request) {
+func GetUserData(w http.ResponseWriter, r *http.Request) {
 	// Call the GetUser function to fetch the user
 	vars := mux.Vars(r)
 	idstr := vars["id"]
